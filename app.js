@@ -75,7 +75,7 @@ document.getElementById("edit-btn").onclick = () => {
   document.getElementById("details-view").classList.add("hidden");
   document.getElementById("series-form").classList.remove("hidden");
 
-  // 🔥 SIEMPRE usar currentSeries
+  //
   document.getElementById("name").value = currentSeries.name || "";
   document.getElementById("description").value = currentSeries.description || "";
   document.getElementById("image").value = currentSeries.image || "";
@@ -122,7 +122,6 @@ document.getElementById("series-form").onsubmit = async (e) => {
       return;
     }
 
-    // 🔥 traer versión actualizada
     const updated = selectedId
       ? await fetch(`${API}/series/${selectedId}`).then(r => r.json())
       : await res.json();
