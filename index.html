@@ -13,49 +13,53 @@
     <aside class="sidebar">
       <h1 class="sidebar-title">Series</h1>
 
-      <input 
-        type="text" 
-        id="search" 
-        class="search-input" 
-        placeholder="Search series..."
-      >
+      <input type="text" id="search" class="search-input" placeholder="Search series...">
 
-      <!-- 🔥 VACÍO: se llena con JS -->
       <ul id="series-list" class="series-list"></ul>
 
       <button id="export" class="export-btn">Export CSV</button>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="main-content">
       <h1 class="main-title">Details</h1>
 
+      <!-- 👀 VIEW MODE -->
+      <div id="details-view" class="details-view hidden">
+        <h2 id="view-name"></h2>
+        <p id="view-description"></p>
+        <img id="view-image">
+
+        <button id="edit-btn" class="save-btn">Edit</button>
+      </div>
+
+      <!-- ✏️ FORM -->
       <form id="series-form" class="details-form">
         <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" placeholder="Enter series name" required>
+          <label>Name</label>
+          <input type="text" id="name" required>
         </div>
 
         <div class="form-group">
-          <label for="description">Description</label>
-          <input type="text" id="description" placeholder="Enter description">
+          <label>Description</label>
+          <input type="text" id="description">
         </div>
 
         <div class="form-group">
-          <label for="image">Image URL</label>
-          <input type="url" id="image" placeholder="Enter image URL">
+          <label>Image URL</label>
+          <input type="url" id="image">
         </div>
 
         <button type="submit" class="save-btn">Save</button>
       </form>
 
-      <!-- 🔒 empieza desactivado -->
+      <!-- 🔘 ACTIONS -->
+      <button id="new-btn" class="export-btn">New Series</button>
       <button id="delete" class="delete-btn" disabled>Delete</button>
     </main>
 
   </div>
 
-  <!-- 🔥 CONEXIÓN AL CEREBRO -->
   <script src="app.js"></script>
 </body>
 </html>
