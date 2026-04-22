@@ -2,6 +2,14 @@
 
 This is the client-side application for the Series Tracker project. It consumes a REST API and allows users to manage TV series through a simple and clean interface.
 
+---
+
+## Backend Repository
+
+https://github.com/alejandro-gperez/series_tracker_backend
+
+---
+
 ## Live Demo
 
 Frontend:
