@@ -66,10 +66,11 @@ https://series-tracker-api-achb.onrender.com
 ---
 
 ## Project Structure
-.
+
 ├── index.html
 ├── styles.css
 ├── app.js
+├── screenshot.png
 └── README.md
 
 ---
