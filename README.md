@@ -72,6 +72,7 @@ https://series-tracker-api-achb.onrender.com
 ├── styles.css
 ├── app.js
 ├── screenshot.png
+├── .gitignore
 └── README.md
 ```
 
