@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "https://series-tracker-api-achb.onrender.com";
 
 let selectedId = null;
 let currentSeries = null;
