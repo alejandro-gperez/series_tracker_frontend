@@ -9,7 +9,6 @@
 <body>
   <div class="container">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
       <h1 class="sidebar-title">Series</h1>
 
@@ -17,14 +16,15 @@
 
       <ul id="series-list" class="series-list"></ul>
 
+      <p id="empty-state" class="empty-state hidden">No series found</p>
+
       <button id="export" class="export-btn">Export CSV</button>
     </aside>
 
-    <!-- Main -->
     <main class="main-content">
       <h1 class="main-title">Details</h1>
 
-      <!-- 👀 VIEW MODE -->
+      <!-- VIEW MODE -->
       <div id="details-view" class="details-view hidden">
         <h2 id="view-name"></h2>
         <p id="view-description"></p>
@@ -33,8 +33,8 @@
         <button id="edit-btn" class="save-btn">Edit</button>
       </div>
 
-      <!-- ✏️ FORM -->
-      <form id="series-form" class="details-form">
+      <!-- FORM MODE -->
+      <form id="series-form" class="details-form hidden">
         <div class="form-group">
           <label>Name</label>
           <input type="text" id="name" required>
@@ -47,18 +47,26 @@
 
         <div class="form-group">
           <label>Image URL</label>
-          <input type="url" id="image">
+          <input type="text" id="image">
         </div>
+
+        <!-- preview -->
+        <img id="preview-image" class="hidden">
 
         <button type="submit" class="save-btn">Save</button>
       </form>
 
-      <!-- 🔘 ACTIONS -->
       <button id="new-btn" class="export-btn">New Series</button>
       <button id="delete" class="delete-btn" disabled>Delete</button>
     </main>
 
   </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <footer class="footer">
+    <p>© 2026 Alejandro Pérez</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>

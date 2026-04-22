@@ -1,18 +1,27 @@
 const API = "http://localhost:3000";
 
 let selectedId = null;
+let currentSeries = null;
 
-// 🔄 LOAD
+/* Load series */
 async function loadSeries(query = "") {
   const res = await fetch(`${API}/series?q=${query}`);
   const data = await res.json();
   renderSeries(data);
 }
 
-// 📄 RENDER
+/* Render list */
 function renderSeries(series) {
   const list = document.getElementById("series-list");
+  const empty = document.getElementById("empty-state");
+
   list.innerHTML = "";
+
+  if (series.length === 0) {
+    empty.classList.remove("hidden");
+  } else {
+    empty.classList.add("hidden");
+  }
 
   series.forEach(s => {
     const li = document.createElement("li");
@@ -25,7 +34,26 @@ function renderSeries(series) {
   });
 }
 
-// 👀 VIEW
+/* Select series */
+function selectSeries(s, el) {
+  selectedId = s.id;
+
+  currentSeries = {
+    id: s.id,
+    name: s.name,
+    description: s.description,
+    image: s.image
+  };
+
+  showDetailsView(currentSeries);
+
+  document.getElementById("delete").disabled = false;
+
+  document.querySelectorAll(".series-item").forEach(e => e.classList.remove("active"));
+  el.classList.add("active");
+}
+
+/* Show view */
 function showDetailsView(s) {
   document.getElementById("details-view").classList.remove("hidden");
   document.getElementById("series-form").classList.add("hidden");
@@ -35,89 +63,121 @@ function showDetailsView(s) {
 
   const img = document.getElementById("view-image");
   img.src = s.image;
-  img.style.display = s.image ? "block" : "none";
+
+  img.onerror = () => img.style.display = "none";
+  img.onload = () => img.style.display = "block";
 }
 
-// 🖱️ SELECT
-function selectSeries(s, el) {
-  selectedId = s.id;
-
-  showDetailsView(s);
-
-  document.getElementById("delete").disabled = false;
-
-  document.querySelectorAll(".series-item").forEach(e => {
-    e.classList.remove("active");
-  });
-
-  el.classList.add("active");
-}
-
-// ✏️ EDIT
+/* Edit */
 document.getElementById("edit-btn").onclick = () => {
-  document.getElementById("details-view").classList.add("hidden");
-  document.getElementById("series-form").classList.remove("hidden");
-
-  // llenar form
-  document.getElementById("name").value = document.getElementById("view-name").textContent;
-  document.getElementById("description").value = document.getElementById("view-description").textContent;
-  document.getElementById("image").value = document.getElementById("view-image").src;
-};
-
-// ➕ NEW
-document.getElementById("new-btn").onclick = () => {
-  resetForm();
+  if (!currentSeries) return;
 
   document.getElementById("details-view").classList.add("hidden");
   document.getElementById("series-form").classList.remove("hidden");
+
+  // 🔥 SIEMPRE usar currentSeries
+  document.getElementById("name").value = currentSeries.name || "";
+  document.getElementById("description").value = currentSeries.description || "";
+  document.getElementById("image").value = currentSeries.image || "";
 };
 
-// 💾 SAVE
+/* Save */
 document.getElementById("series-form").onsubmit = async (e) => {
   e.preventDefault();
 
-  const s = {
-    name: name.value,
-    description: description.value,
-    image: image.value
-  };
+  const nameVal = document.getElementById("name").value.trim();
 
-  if (selectedId) {
-    await fetch(`${API}/series/${selectedId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(s)
-    });
-  } else {
-    await fetch(`${API}/series`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(s)
-    });
+  if (!nameVal) {
+    alert("Name is required");
+    return;
   }
 
-  resetForm();
-  loadSeries();
+  const s = {
+    name: document.getElementById("name").value.trim(),
+    description: document.getElementById("description").value,
+    image: document.getElementById("image").value
+  };
+
+  let res;
+
+  try {
+    if (selectedId) {
+      res = await fetch(`${API}/series/${selectedId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(s)
+      });
+    } else {
+      res = await fetch(`${API}/series`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(s)
+      });
+    }
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(text);
+      alert("Error saving series");
+      return;
+    }
+
+    // 🔥 traer versión actualizada
+    const updated = selectedId
+      ? await fetch(`${API}/series/${selectedId}`).then(r => r.json())
+      : await res.json();
+
+    currentSeries = updated;
+    selectedId = updated.id;
+
+    showDetailsView(updated);
+    loadSeries();
+
+  } catch (err) {
+    console.error(err);
+    alert("Network error");
+  }
 };
 
-// 💀 DELETE
+/* Delete */
 document.getElementById("delete").onclick = async () => {
   if (!selectedId) return;
 
-  await fetch(`${API}/series/${selectedId}`, {
-    method: "DELETE"
-  });
+  if (!confirm("Delete this series?")) return;
 
-  resetForm();
+  await fetch(`${API}/series/${selectedId}`, { method: "DELETE" });
+
+  resetUI();
   loadSeries();
 };
 
-// 🔍 SEARCH
+/* New */
+document.getElementById("new-btn").onclick = () => {
+  resetUI();
+
+  document.getElementById("series-form").classList.remove("hidden");
+};
+
+/* Reset UI */
+function resetUI() {
+  selectedId = null;
+  currentSeries = null;
+
+  document.getElementById("series-form").reset();
+  document.getElementById("series-form").classList.add("hidden");
+  document.getElementById("details-view").classList.add("hidden");
+
+  document.getElementById("delete").disabled = true;
+
+  document.querySelectorAll(".series-item").forEach(el => el.classList.remove("active"));
+}
+
+/* Search */
 document.getElementById("search").oninput = (e) => {
   loadSeries(e.target.value);
 };
 
-// 📄 CSV
+/* CSV */
 document.getElementById("export").onclick = async () => {
   const res = await fetch(`${API}/series`);
   const data = await res.json();
@@ -137,16 +197,5 @@ document.getElementById("export").onclick = async () => {
   a.click();
 };
 
-// 🧹 RESET
-function resetForm() {
-  selectedId = null;
-  document.getElementById("series-form").reset();
-  document.getElementById("delete").disabled = true;
-
-  document.querySelectorAll(".series-item").forEach(el => {
-    el.classList.remove("active");
-  });
-}
-
-// 🚀 INIT
+/* Init */
 loadSeries();
